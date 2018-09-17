@@ -122,18 +122,18 @@ public class SensitiveWordsFilter {
      * @return  敏感词列表
      */
     public Set<String> getSensitiveWord(String str) {
-        Set<String> sensitiveWords = null;
+        Set<String> sensitiveWords = new HashSet<>();
         for (int i = 0; i < str.length(); i++) {
             int beginIndex = i;
             List<Integer> matchLengthList = checkSensitieWord(str, beginIndex);
-            sensitiveWords = matchLengthList.stream()
-                    .map(matchLength -> str.substring(beginIndex, beginIndex + matchLength + 1))
-                    .collect(Collectors.toSet());
+            sensitiveWords.addAll(matchLengthList.stream()
+                    .map(matchLength -> str.substring(beginIndex, beginIndex + matchLength))
+                    .collect(Collectors.toSet()));
             if (matchLengthList.size() > 0) {
-                i = i + matchLengthList.get(matchLengthList.size() - 1);
+                i = i + matchLengthList.get(0) - 1;
             }
         }
-        return sensitiveWords != null ? sensitiveWords : Collections.emptySet();
+        return sensitiveWords;
     }
 
 }
