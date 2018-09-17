@@ -174,7 +174,7 @@ public class SensitiveWordsFilter {
     }
 
     /**
-     * 获取和替换的字符串
+     * 获取用于替换的字符串
      *
      * @param replaceChar
      * @param length
