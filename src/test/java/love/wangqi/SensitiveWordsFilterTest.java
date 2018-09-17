@@ -24,8 +24,9 @@ public class SensitiveWordsFilterTest {
             }
         };
         SensitiveWordsFilter sensitiveWordsFilter = SensitiveWordsFilter.getInstance(sensitiveWordsReader);
-        Set<String> words = sensitiveWordsFilter.getSensitiveWord("abczhiiqbc");
+        Set<String> words = sensitiveWordsFilter.getSensitiveWords("abczhiiqbc");
         System.out.println(words);
-
+        String str = sensitiveWordsFilter.replaceSensitiveWords("abczhiiqbc", "*");
+        System.out.println(str);
     }
 }

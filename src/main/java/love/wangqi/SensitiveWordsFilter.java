@@ -97,7 +97,7 @@ public class SensitiveWordsFilter {
      * @param beginIndex    起始的检测位置
      * @return  从起始位置开始，敏感词的长度列表
      */
-    private List<Integer> checkSensitieWord(String str, int beginIndex) {
+    private List<Integer> checkSensitiveWord(String str, int beginIndex) {
         int matchLength = 0;
         List<Integer> matchLengthList = new ArrayList<>();
         Map map = sensitiveWordMap;
@@ -121,11 +121,11 @@ public class SensitiveWordsFilter {
      * @param str   待检测字符串
      * @return  敏感词列表
      */
-    public Set<String> getSensitiveWord(String str) {
+    public Set<String> getSensitiveWords(String str) {
         Set<String> sensitiveWords = new HashSet<>();
         for (int i = 0; i < str.length(); i++) {
             int beginIndex = i;
-            List<Integer> matchLengthList = checkSensitieWord(str, beginIndex);
+            List<Integer> matchLengthList = checkSensitiveWord(str, beginIndex);
             sensitiveWords.addAll(matchLengthList.stream()
                     .map(matchLength -> str.substring(beginIndex, beginIndex + matchLength))
                     .collect(Collectors.toSet()));
@@ -134,6 +134,58 @@ public class SensitiveWordsFilter {
             }
         }
         return sensitiveWords;
+    }
+
+    /**
+     * 获取敏感词的起止位置
+     * @param str   待检测字符串
+     * @return  map，key为起始位置，value为敏感词的长度列表
+     */
+    public Map<Integer, List<Integer>> getSensitiveWordsPosition(String str) {
+        Map<Integer, List<Integer>> sensitiveWordsPosition = new HashMap<>();
+        for (int i = 0; i < str.length(); i++) {
+            int beginIndex = i;
+            List<Integer> matchLengthList = checkSensitiveWord(str, beginIndex);
+            sensitiveWordsPosition.put(i, matchLengthList);
+            if (matchLengthList.size() > 0) {
+                i = i + matchLengthList.get(0) - 1;
+            }
+        }
+        return sensitiveWordsPosition;
+    }
+
+    /**
+     * 将字符串中的敏感词替换成给定的字符
+     * @param str   待检测字符串
+     * @param replaceStr    替换字符
+     * @return  替换后的字符串
+     */
+    public String replaceSensitiveWords(String str, String replaceStr) {
+        StringBuilder s = new StringBuilder(str);
+        Map<Integer, List<Integer>> sensitiveWordsPosition = getSensitiveWordsPosition(str);
+        for (Map.Entry<Integer, List<Integer>> entry : sensitiveWordsPosition.entrySet()) {
+            Integer beginIndex = entry.getKey();
+            List<Integer> matchLengthList = entry.getValue();
+            for (Integer matchLength : matchLengthList) {
+                s.replace(beginIndex, beginIndex + matchLength, getReplaceChars(replaceStr, matchLength));
+            }
+        }
+        return s.toString();
+    }
+
+    /**
+     * 获取和替换的字符串
+     *
+     * @param replaceChar
+     * @param length
+     * @return
+     */
+    private String getReplaceChars(String replaceChar, int length) {
+        StringBuilder resultReplace = new StringBuilder(replaceChar);
+        for (int i = 1; i < length; i++) {
+            resultReplace.append(replaceChar);
+        }
+        return resultReplace.toString();
     }
 
 }
