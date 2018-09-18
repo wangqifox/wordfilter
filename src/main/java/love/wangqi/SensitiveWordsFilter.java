@@ -38,7 +38,11 @@ public class SensitiveWordsFilter {
     }
 
     private void init() {
-        Set<String> words = sensitiveWordsReader.readSensitiveWords();
+        Set<String> lines = sensitiveWordsReader.readSensitiveWords();
+        Set<String> words = lines.stream()
+                .map(line -> Arrays.asList(line.split(" ")))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
         sensitiveWordMap = new HashMap<>(words.size());
         addSensitiveWords(words);
     }
