@@ -17,8 +17,8 @@ public class SensitiveWordsFilterTest {
             @Override
             public Set<String> readSensitiveWords() {
                 Set<String> words = new HashSet<>();
-                words.add("abc bc");
-                words.add("hii");
+                words.add("abc");
+                words.add("hii de");
                 words.add("z");
                 return words;
             }
@@ -26,11 +26,18 @@ public class SensitiveWordsFilterTest {
         SensitiveWordsFilter sensitiveWordsFilter = SensitiveWordsFilter.getInstance(sensitiveWordsReader);
         Set<String> words = sensitiveWordsFilter.getSensitiveWords("abczhiiqbc");
         System.out.println(words);
+
+        CombinationSensitiveWordsFilter combinationSensitiveWordsFilter = CombinationSensitiveWordsFilter.getInstance(sensitiveWordsReader);
+        words = combinationSensitiveWordsFilter.getSensitiveWords(words);
+        System.out.println(words);
+
         String str = sensitiveWordsFilter.replaceSensitiveWords("abczhiiqbc", "*");
         System.out.println(str);
 
         sensitiveWordsFilter.delSensitiveWord("abc");
         words = sensitiveWordsFilter.getSensitiveWords("abczhiiqbc");
         System.out.println(words);
+
+
     }
 }

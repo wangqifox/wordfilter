@@ -68,7 +68,7 @@ public class SensitiveWordsFilter {
         Map map = sensitiveWordMap;
         for (int i = 0; i < word.length(); i++) {
             String ch = word.substring(i, i + 1);
-            Object wordMap = sensitiveWordMap.get(ch);
+            Object wordMap = map.get(ch);
 
             if (wordMap != null) {
                 map = (Map) wordMap;
