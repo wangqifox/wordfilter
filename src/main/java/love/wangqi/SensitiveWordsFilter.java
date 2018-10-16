@@ -38,7 +38,11 @@ public class SensitiveWordsFilter {
     }
 
     private void init() {
-        Set<String> words = sensitiveWordsReader.readSensitiveWords();
+        Set<String> lines = sensitiveWordsReader.readSensitiveWords();
+        Set<String> words = lines.stream()
+                .map(line -> Arrays.asList(line.split(" ")))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
         sensitiveWordMap = new HashMap<>(words.size());
         addSensitiveWords(words);
     }
@@ -62,15 +66,14 @@ public class SensitiveWordsFilter {
         }
         word = word.trim();
         Map map = sensitiveWordMap;
-        Map subMap;
         for (int i = 0; i < word.length(); i++) {
             String ch = word.substring(i, i + 1);
-            Object wordMap = sensitiveWordMap.get(ch);
+            Object wordMap = map.get(ch);
 
             if (wordMap != null) {
                 map = (Map) wordMap;
             } else {
-                subMap = new HashMap();
+                Map subMap = new HashMap();
                 subMap.put("isEnd", "0");
                 map.put(ch, subMap);
                 map = subMap;
@@ -88,6 +91,32 @@ public class SensitiveWordsFilter {
     public synchronized void delSensitiveWord(String word) {
         if (word == null || "".equals(word)) {
             return;
+        }
+        word = word.trim();
+        Map map = sensitiveWordMap;
+        int length = word.length();
+        Map[] mapArray = new Map[length];
+
+        for (int i = 0; i < length; i++) {
+            String ch = word.substring(i, i + 1);
+            map = (Map) map.get(ch);
+            if (map == null) {
+                return;
+            }
+            mapArray[i] = map;
+        }
+        boolean isEnd = "1".equals(map.get("isEnd"));
+        if (isEnd) {
+            map.put("isEnd", "0");
+        }
+        for (int i = mapArray.length - 1; i > 0; i--) {
+            if (map.size() == 1 && "0".equals(map.get("isEnd"))) {
+                map.clear();
+                mapArray[i - 1].remove(word.substring(i, i + 1));
+                map = mapArray[i - 1];
+            } else {
+                break;
+            }
         }
     }
 
